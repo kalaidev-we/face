@@ -1,0 +1,22 @@
+# Ignore files and directories
+node_modules
+dist
+dist-ssr
+.next
+out
+build
+coverage
+
+# Ignore files
+*.log
+.DS_Store
+*.lock
+pnpm-lock.yaml
+yarn.lock
+
+# Config files
+.env
+.env.local
+
+# Public files
+public

@@ -66,24 +66,155 @@ face/
 
 ## 💻 Local Setup & Development
 
-### 1. Install Dependencies
-Clone the repository and install packages:
+### Prerequisites
+- Node.js 18+ and npm
+- Git
+- Modern web browser with camera access support
+
+### 1. Clone & Install
 ```bash
+git clone https://github.com/yourusername/face.git
+cd face
 npm install
 ```
 
-### 2. Run Locally
-Start the development server:
+### 2. Environment Configuration
+Copy the environment template and add your Supabase credentials:
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local`:
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+**Security Note:** Never commit `.env.local` to version control. It's already in `.gitignore`.
+
+### 3. Development Server
+Start the local development server:
 ```bash
 npm run dev
 ```
-Open the localhost address in your web browser.
+Open `http://localhost:5173` (or the URL shown in terminal) in your browser.
 
-### 3. Build for Production
-Verify typescript compilation and compile assets:
+### 4. Linting & Type Checking
+Verify code quality before committing:
+```bash
+npm run lint
+npm run build  # Verifies TypeScript compilation
+```
+
+### 5. Production Build
+Create an optimized production bundle:
 ```bash
 npm run build
+npm run preview  # Test production build locally
 ```
+
+---
+
+## 🔌 Connecting to Supabase (Live Database)
+
+To connect the application to a live backend database:
+
+1. **Create a Supabase Project**
+   - Go to [supabase.com](https://supabase.com) and create a new project
+   - Save your Project URL and Anon API key from Settings → API
+
+2. **Setup Environment Variables**
+   - Update `.env.local` with your credentials (see section above)
+
+3. **Initialize Database Schema**
+   - Go to your Supabase **SQL Editor** and execute the contents of [schema.sql](schema.sql)
+   - This will enable `pgvector`, create tables, indexes, and RLS policies
+
+4. **Create Storage Buckets**
+   - In Supabase **Storage**, create these public buckets:
+     - `student-photos` — for enrolled face images
+     - `attendance-snaps` — for attendance verification snapshots
+
+5. **Verify Connection**
+   - Restart your dev server: `npm run dev`
+   - Check browser console for any connection errors
+   - Navigate to Settings page to verify Supabase connection
+
+---
+
+## 📋 Available Scripts
+
+- `npm run dev` — Start development server with hot reload
+- `npm run build` — Build for production (includes TypeScript check)
+- `npm run lint` — Run ESLint to check code quality
+- `npm run preview` — Preview production build locally
+
+---
+
+## 🔒 Security Best Practices
+
+- **Never commit credentials:** Always use `.env.local` for sensitive data
+- **Use RLS Policies:** Database is protected with Row-Level Security (see schema.sql)
+- **Validate User Input:** All form inputs are validated before database operations
+- **CORS Configuration:** Configure Supabase CORS settings for your domain
+- **Rate Limiting:** Consider implementing rate limiting on API endpoints for production
+
+---
+
+## 👥 Mock Mode Account Credentials
+
+If you do not have a Supabase instance set up, you can log in instantly in **Mock Mode** using:
+
+- **Super Admin:** `admin@facetrack.ai` (Full dashboard, system settings, audit logs)
+- **Staff Handler:** `sarah.jenkins@facetrack.ai` (Registry management, scanning access)
+- **Student:** `alex.mercer@facetrack.ai` (Personal metrics, attendance history)
+
+*Password field can be left blank in mock mode.*
+
+---
+
+## 🐛 Troubleshooting
+
+### App shows "Failed to load face detection models"
+- Check internet connection (models load from CDN)
+- Clear browser cache and refresh
+- Try a different browser if issue persists
+
+### Camera not working
+- Ensure browser has camera permissions
+- Check that you're using HTTPS (or localhost) for camera access
+- Try reloading the page
+
+### Supabase connection fails
+- Verify `.env.local` has correct URL and key
+- Check that Supabase project is active
+- Confirm network connectivity to Supabase
+
+### TypeScript errors on build
+- Run `npm install` to ensure all dependencies are installed
+- Check that your `node_modules` directory wasn't corrupted
+- Try deleting `node_modules` and running `npm install` again
+
+---
+
+## 📦 Deployment
+
+### Deploy to Vercel (Recommended)
+```bash
+npm run build
+# Push to GitHub, then connect to Vercel for automatic deployments
+```
+
+### Deploy to Other Platforms
+- Ensure `npm run build` completes without errors
+- Set environment variables on your hosting platform
+- Point to the `dist` directory as the build output
+
+---
+
+## 📝 License
+
+This project is proprietary and confidential.
 
 ---
 
