@@ -5,6 +5,7 @@ import { detectAndValidateFace, resetLivenessTracker } from '../lib/faceDetector
 import { matchStudentFace, markAttendance } from '../lib/db';
 import type { Student } from '../lib/db';
 import { toast } from 'sonner';
+import { DEFAULT_CAMPUS, calculateDistance } from '../lib/geofenceConfig';
 
 export default function AttendanceMarking() {
   const { activeCamera, setActiveCamera, availableCameras, setAvailableCameras } = useStore();
@@ -40,8 +41,8 @@ export default function AttendanceMarking() {
     distance: number | null;
     inside: boolean;
   }>({
-    latitude: 37.7749, // Default Silicon Valley Campus Coordinates
-    longitude: -122.4194,
+    latitude: DEFAULT_CAMPUS.latitude,
+    longitude: DEFAULT_CAMPUS.longitude,
     distance: null,
     inside: true // Start inside for mock convenience, will update with geolocation
   });
@@ -100,30 +101,15 @@ export default function AttendanceMarking() {
         (position) => {
           const lat1 = position.coords.latitude;
           const lon1 = position.coords.longitude;
-          const lat2 = geofence.latitude;
-          const lon2 = geofence.longitude;
+          const lat2 = DEFAULT_CAMPUS.latitude;
+          const lon2 = DEFAULT_CAMPUS.longitude;
 
-          // Haversine distance formula
-          const R = 6371e3; // metres
-          const phi1 = (lat1 * Math.PI) / 180;
-          const phi2 = (lat2 * Math.PI) / 180;
-          const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
-          const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+          const distance = calculateDistance(lat1, lon1, lat2, lon2);
 
-          const a =
-            Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-            Math.cos(phi1) * Math.cos(phi2) *
-            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-          const distance = R * c; // in metres
-          
-          // Limit to 200m
-          const limit = 200;
           setGeofence(prev => ({
             ...prev,
             distance: Math.round(distance),
-            inside: distance <= limit
+            inside: distance <= DEFAULT_CAMPUS.radiusMeters
           }));
         },
         (error) => {
